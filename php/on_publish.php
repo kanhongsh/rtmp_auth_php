@@ -9,57 +9,51 @@ function auth_publish() {
     http_response_code(201);
 }
 
-//@$name=trim($_POST["name"]);
-//@$pass=trim($_POST["pass"]);
-
-//$name = isset($_GET['name']) ? $_GET['name'] : '';
-//$pass = isset($_GET['pass']) ? $_GET['pass'] : '';
-
-$name = isset($_POST['name']) ? $_POST['name'] : '';
 $pass = isset($_POST['pass']) ? $_POST['pass'] : '';
+$name = isset($_POST['name']) ? $_POST['name'] : '';
 
-$savename= "test";
-$savepass = "123456";
+if (empty($name)) {
+    $name = isset($_GET['name']) ? $_GET['name'] : '';
+}
+if (empty($pass)) {
+    $pass = isset($_GET['pass']) ? $_GET['pass'] : '';
+}
 
-$savename2= "test1";
-$savepass2 = "1234";
+$savename= array("test"=>"123456", "test1"=>"123456", "publisher"=>"1234", "play"=>"1234", "test3"=>"123", "test4"=>"123");
 
-echo "name ";
-echo $name;
-echo "pass ";
-echo $pass;
+echo "\nname " . $name;
+echo "\npass " . $pass;
 
-file_put_contents("c:/server/logs/Result1.txt", "name=" . $name . "\r\n", FILE_APPEND);
-file_put_contents("c:/server/logs/Result1.txt", "pass=" . $pass . "\r\n", FILE_APPEND);
+file_put_contents("c:/server/logs/PublishResult.txt", "name=" . $name . "\r\n", FILE_APPEND);
+file_put_contents("c:/server/logs/PublishResult.txt", "pass=" . $pass . "\r\n", FILE_APPEND);
 
 
 //如果都不是空值执行数据库查询
-if(empty($name) || empty($pass))
+if(empty($name))
 {
-    echo "串码流不正确 1";
-    file_put_contents("c:/server/logs/Result1.txt", "串码流不正确 1\r\n", FILE_APPEND);
+    echo "\nname is empty";
+    file_put_contents("c:/server/logs/PublishResult.txt", "name is empty\r\n", FILE_APPEND);
     abort_publish();
 }
 else 
 {
-    if (strcmp($name, $savename) == 0 && strcmp($pass, $savepass) == 0)
-    {
-        echo "OK!";
-        //header('HTTP/1.0 201 Created');
-        file_put_contents("c:/server/logs/Result1.txt", "串码流正确 1\r\n", FILE_APPEND);
-        auth_publish();
+    $bfound = False;
+    foreach ($savename as $key=>$value) {
+        if (strcasecmp($name, $key) == 0) {
+            echo "\nKey=" . $key . ", Value=" . $value;
+            $bfound = True;
+        }
     }
-    else if (strcmp($name, $savename2) == 0 && strcmp($pass, $savepass2) == 0)
+    if ($bfound)
     {
-        echo "OK!";
-        //header('HTTP/1.0 201 Created');
-        file_put_contents("c:/server/logs/Result1.txt", "串码流正确 2\r\n", FILE_APPEND);
+        echo "\nOK!";
+        file_put_contents("c:/server/logs/PublishResult.txt", "name(" . $name .") verify succeed\r\n", FILE_APPEND);
         auth_publish();
     }
     else
     {
-        echo "串码流不正确 2";
-        file_put_contents("c:/server/logs/Result1.txt", "串码流不正确 2\r\n", FILE_APPEND);
+        echo "\npass verify failed";
+        file_put_contents("c:/server/logs/PublishResult.txt", "pass verify failed\r\n", FILE_APPEND);
         abort_publish();
     }
 }
